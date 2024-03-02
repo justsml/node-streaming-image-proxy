@@ -51,3 +51,23 @@ We don't want to store all of these photos on our server. Instead, we want to lo
 - `/img/614/3` - returns the third image for product 614.
 - `/img/614/3/50%` - returns the third image for product 614 resized to 50% of the original size.
 - `/img/614/3/200w` - returns the third image for product 614 resized to 200 pixels wide.
+
+
+## Notes
+
+### Testing
+
+To simulate slow networks, you can use the `throttle` package.
+
+```sh
+npm install throttle
+```
+
+```ts
+import * as Throttle from 'throttle';
+const maxSpeedInMBs = 0.5;
+const throttle = new Throttle(1024 * 1024 * maxSpeedInMBs); // throttle to 0.5MB/sec
+
+// instead of returning the readStream directly,
+return readStream.pipe(throttle);
+```

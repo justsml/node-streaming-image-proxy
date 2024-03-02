@@ -1,4 +1,4 @@
-import ImageRouter from './imagesRouter'
+import ImageRouter from './imageRouter'
 import { baseServer, catchErrorHandler, notFoundHandler } from './shared'
 
 export const App = () =>
