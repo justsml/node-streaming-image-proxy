@@ -18,7 +18,7 @@ export function connectDb(): Database {
   )
 
   seedPhotos.map((productImg) => {
-    insertCmd.run({...productImg, url: `https://picsum.photos/400`})
+    insertCmd.run({...productImg, url: `https://picsum.photos/1024`})
   })
 
   console.debug('Database loaded & initialized')

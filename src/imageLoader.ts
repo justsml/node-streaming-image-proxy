@@ -17,8 +17,8 @@ export async function getStreamInfoFromUrl(url: string) {
 
   return {
     stream: response.data,
-    contentLength: Number(response.headers['content-length']!) || 0,
-    contentType: response.headers['content-type']!,
+    byteCount: Number(response.headers['content-length']!) || 0,
+    mimeType: response.headers['content-type']! as string,
   }
 }
 

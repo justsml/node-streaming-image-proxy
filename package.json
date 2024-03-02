@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "node test",
-    "start": "node src/index.js",
+    "start": "NODE_ENV=production tsx src/index.ts",
     "dev": "tsx watch src/index.ts"
   },
   "keywords": [],
@@ -19,7 +19,9 @@
     "libsql": "^0.3.4",
     "morgan": "^1.10.0",
     "pino": "^8.19.0",
-    "pino-pretty": "^10.3.1"
+    "pino-http": "^9.0.0",
+    "pino-pretty": "^10.3.1",
+    "sharp": "^0.33.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -27,6 +29,7 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.24",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.3.1"
   }
 }
