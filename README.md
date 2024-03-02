@@ -41,8 +41,8 @@ We don't want to store all of these photos on our server. Instead, we want to lo
 
 ### API Endpoints
 
-- `/img/:product_id/:rank`
-- `/img/:product_id/:rank/:resize`
+- `/img/:product_id/:photo_index`
+- `/img/:product_id/:photo_index/:resize`
 
 ### Example
 
@@ -51,5 +51,3 @@ We don't want to store all of these photos on our server. Instead, we want to lo
 - `/img/614/3` - returns the third image for product 614.
 - `/img/614/3/50%` - returns the third image for product 614 resized to 50% of the original size.
 - `/img/614/3/200w` - returns the third image for product 614 resized to 200 pixels wide.
-
-The server is designed to be as simple as possible. It uses the `http` and `https` modules to proxy requests to the source URL. It uses the `range` header to support streaming and the `content-type` header to support video playback.
