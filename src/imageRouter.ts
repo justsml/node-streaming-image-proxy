@@ -39,7 +39,7 @@ const imagesRouter = Router().get(
           const { stream, byteCount, mimeType } = await processImage({
             url,
             resize,
-            changeFormat: format,
+            format,
             quality,
           })
 
@@ -58,19 +58,20 @@ const imagesRouter = Router().get(
 const processImage = async ({
   url,
   resize,
-  changeFormat,
+  format,
   quality,
 }: ProcessImageArgs) => {
   let { stream, byteCount, mimeType } = await getStreamInfoFromUrl(url)
 
-  if (resize || changeFormat || quality) {
-    logger.info({ resize, changeFormat, quality }, 'Resizing image')
+  if (resize || format || quality) {
+    logger.info({ resize, format, quality }, 'Resizing image')
     stream = resizeImage(stream, {
       resizeExpression: resize,
-      changeFormat,
+      format,
       quality,
     })
     byteCount = 0
+    if (format) mimeType = `image/${format}`
   }
 
   return { stream, byteCount, mimeType }
@@ -79,7 +80,7 @@ const processImage = async ({
 type ProcessImageArgs = {
   url: string
   resize?: string
-  changeFormat?: ImageFormats
+  format?: ImageFormats
   quality?: number
 }
 

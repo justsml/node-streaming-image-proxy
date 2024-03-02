@@ -1,5 +1,5 @@
 import express from 'express'
-import morgan from 'morgan'
+// import morgan from 'morgan'
 import helmet from 'helmet'
 import cors from 'cors'
 import pinoHttp from 'pino-http'
@@ -8,7 +8,7 @@ import type { Request, Response, NextFunction } from 'express'
 import logger from './logger'
 import { ImageFormats } from './imageResizer'
 
-const logMode = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'
+// const logMode = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'
 
 const validImageFormats: ImageFormats[] = [
   'webp',
@@ -21,17 +21,25 @@ const validImageFormats: ImageFormats[] = [
  * Check if the image format is supported.
  */
 export const isValidImageFormat = (format: string): ImageFormats | undefined =>
-  format in validImageFormats ? (format as ImageFormats) : undefined
+  // @ts-expect-error
+  validImageFormats.includes(format) ? (format as ImageFormats) : undefined
 
-export const baseServer = () =>
+export const baseServer = (disableLogging: boolean = false) =>
   express()
     .use(helmet())
     .use(express.json())
     .use(express.urlencoded({ extended: false }))
-    // .use(pinoHttp({ logger }))
+
+    .use(disableLogging ? echoRoute : pinoHttp({ logger }))
     // .use(morgan(logMode))
     .use(cors({ origin: true, credentials: true }))
     .disable('x-powered-by')
+
+export const echoRoute = (
+  _request: Request,
+  _response: Response,
+  next: NextFunction,
+) => next()
 
 export function notFoundHandler(request: Request, response: Response) {
   response

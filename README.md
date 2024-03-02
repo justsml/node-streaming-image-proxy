@@ -11,34 +11,44 @@ npm i
 npm start
 ```
 
-## Design
+## Overview
 
-Let's say we have an e-commerce site with **10's of millions of products.** Each product may have **up to 100 photos.** Bottom line: we need to support a BILLION+ photos!
+This project solves a common & poorly documented challenge: **using node.js to stream media from a (hidden) source URL to a browser or native clients.**
 
-We don't want to store all of these photos on our server. Instead, we want to lookup the desired URL in our DB & start streaming the image from the server to the browser. Which has a bonus effect of hiding any vendor or partner names from source URLs.
+### The Scenario
 
-- [x] ~~Excellent~~ Better coding patterns!
-- [x] Dynamic resizing!
-- [ ] Dynamic buffering!
+Let's say we have an e-commerce site with **10's of millions of products.** Each product may have **up to 100 photos.** Bottom line: we need to **support a BILLION+ photos!**
+
+Every week 80% of all **primary** photos are requested.
+The vast majority of those 'additional' photos are rarely requested. Who really looks at the 88th photo of a product?
+
+We need a streaming image proxy, that meets the following requirements:
+
+### Requirements
+
+- ✅ **Streaming** - For minimal memory usage.
+- ✅ **Dynamic Resizing, Quality & Format** - To reduce client data over the wire.
+- ✅ **Dynamic Buffering** - Optimize server load given many tiny reqs.
+- ✅ Hide source URL details (protect vendor or partner names.)
+- 💪 ~~Excellent~~ Better coding patterns!
+- ❌ No sync/cron jobs.
+- ❌ On-demand.
+- ❌ No long-term caching. Avoid stale data.
+- ❌ No need to store images locally.
+
+### Ideas
+
+A list of related things I've worked on previously - some might just might make sense to include in this project.
+
 - [x] Few files.
 - [x] Minimal dependencies.
+- [ ] Image filters?
+- [ ] Watermark?
+- [ ] Credit?
+- [ ] EXIF scrubbing?
 - [ ] [Benchmarks.](#benchmarks)
 - [ ] Video streaming? Byte chunking?
-- [ ] Text streaming (support for ChatGPT or similar services)?
-
-### Supporting Data
-
-> Two products with 2 and 5 images respectively.
-
-| product_id | media_rank | url |
-|------------|------------|-----|
-| 42        | 1  | example.com/900/1 |
-| 42        | 2  | example.com/900/2 |
-| 614       | 1  | acme.example.com/614/1 |
-| 614       | 2  | acme.example.com/614/2 |
-| 614       | 3  | acme.example.com/614/3 |
-| 614       | 4  | acme.example.com/614/4 |
-| 614       | 5  | acme.example.com/614/5 |
+- [ ] Text streaming? (support for ChatGPT or similar services)?
 
 ### API Endpoints
 
@@ -55,8 +65,28 @@ We don't want to store all of these photos on our server. Instead, we want to lo
 
 ## Notes
 
+### Supporting Data
+
+The following is a sample of the data that is used to support the API.
+
+It's okay if you store your photos slightly differently, for example in a JSONB or Array column.
+Only minor adjustments would be needed in the [ProductsApi](src/productsApi.ts) module.
+
+> Two products with 2 and 5 images respectively.
+
+| product_id | media_rank | url                    |
+| ---------- | ---------- | ---------------------- |
+| 42         | 1          | https://picsum.photos/1024 |
+| 42         | 2          | https://picsum.photos/1024 |
+| 614        | 1          | https://picsum.photos/1024 |
+| 614        | 2          | https://picsum.photos/1024 |
+| 614        | 3          | https://picsum.photos/1024 |
+| 614        | 4          | https://picsum.photos/1024 |
+| 614        | 5          | https://picsum.photos/1024 |
+
 ### Testing
 
+<!-- 
 To simulate slow networks, you can use the `throttle` package.
 
 ```sh
@@ -64,13 +94,14 @@ npm install throttle
 ```
 
 ```ts
-import * as Throttle from 'throttle';
-const maxSpeedInMBs = 0.5;
-const throttle = new Throttle(1024 * 1024 * maxSpeedInMBs); // throttle to 0.5MB/sec
+import * as Throttle from 'throttle'
+const maxSpeedInMBs = 0.5
+const throttle = new Throttle(1024 * 1024 * maxSpeedInMBs) // throttle to 0.5MB/sec
 
 // instead of returning the readStream directly,
-return readStream.pipe(throttle);
-```
+return readStream.pipe(throttle)
+``` 
+-->
 
 #### CLI Testing
 
@@ -83,7 +114,17 @@ curl -v http://localhost:3000/img/614/3/50w
 
 ### Benchmarks
 
-Test using your favorite benchmarking tool: [ab](https://httpd.apache.org/docs/2.4/programs/ab.html), [wrk](https://github.com/wg/wrk), [autocannon](https://github.com/mcollina/autocannon), [siege](https://www.joedog.org/siege-home/), [hey](https://github.com/rakyll/hey).
+#### [TL;DR Show Results](#results-un-buffered)
+
+First, start the server with logging disabled.
+
+```sh
+DISABLE_LOGGING=true npm run start
+```
+
+Next, use your favorite benchmarking tool to hammer away at your service.
+
+> HTTP Benchmarking tools: [ab](https://httpd.apache.org/docs/2.4/programs/ab.html), [wrk](https://github.com/wg/wrk), [autocannon](https://github.com/mcollina/autocannon), [siege](https://www.joedog.org/siege-home/), [hey](https://github.com/rakyll/hey).
 
 ```sh
 ab -n 1000 -c 100 http://localhost:3000/img/42/1
@@ -95,11 +136,9 @@ hey -n 1000 -c 100 http://localhost:3000/img/42/1/1024w
 
 #### Results: Un-buffered
 
-Using a 2022 MacBook Air, M2 chip, 24GB RAM.
+_Note:_ Testing on a 2022 MacBook Air, M2, 24GB RAM.
 
-When source images are limited to [600px](https://picsum.photos/600) we can hit 80/reqs/sec.
-
-If the image size doubles to [1200px](https://picsum.photos/1200), the throughput drops to roughly 26-30/reqs/sec.
+When source images are [600px](https://picsum.photos/600) converting to `500px`, we can hit 80/reqs/sec.
 
 ```sh
 ab -n 1000 -c 100 http://localhost:3000/img/614/3/500
@@ -141,9 +180,9 @@ Percentage of the requests served within a certain time (ms)
   98%   1691
   99%   1780
  100%   2119 (longest request)
- ```
+```
 
-#### Downscaling Results
+#### Results: Down-scaling to 150px
 
 > Using source sizes of `1200px` and output at `150px`:
 
@@ -151,7 +190,7 @@ Percentage of the requests served within a certain time (ms)
 ❯ ab -n 1000 -c 100 http://localhost:3000/img/614/3/150
 # ...
 
-Server Software:        
+Server Software:
 Server Hostname:        localhost
 Server Port:            3000
 
@@ -187,4 +226,4 @@ Percentage of the requests served within a certain time (ms)
   98%   1900
   99%   2019
  100%   2119 (longest request)
- ```
+```
