@@ -2,9 +2,9 @@ import { pipeline } from 'stream/promises'
 import { Router } from 'express'
 import { ProductsApi } from '@/productsApi'
 import { getStreamInfoFromUrl } from '@/imageLoader'
-import logger from '@/logger'
 import { ImageFormats, resizeImage } from '@/imageResizer'
 import { isValidImageFormat } from '@/shared'
+import logger from '@/logger'
 
 const imagesRouter = Router().get(
   '/:id/:index/:resize?',

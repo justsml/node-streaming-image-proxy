@@ -1,5 +1,18 @@
 # Node.js Streaming Proxy
 
+- [Description](#description)
+- [Overview](#overview)
+  - [The Scenario](#the-scenario)
+  - [Requirements](#requirements)
+  - [API Endpoints](#api-endpoints)
+- [Notes](#notes)
+  - [Supporting Data](#supporting-data)
+- [Testing](#testing)
+  - [CLI Testing](#cli-testing)
+- [Benchmarks](#benchmarks)
+  - [TL;DR Show Results](#tldr-show-results)
+- [Ideas](#ideas)
+
 ## Description
 
 This is a **reference quality** streaming proxy server that can be used to proxy content from a source URL to the browser.
@@ -38,10 +51,9 @@ We need a streaming image proxy, that meets the following requirements:
 - ✅ **Dynamic Buffering** - Optimize server load given many tiny reqs.
 - ✅ Hide source URL details (protect vendor or partner names.)
 - 💪 Better stream coding patterns!
-- ❌ No sync/cron jobs.
-- ❌ On-demand.
+- ❌ No sync/cron jobs. On-demand.
+- ❌ No need to store images.
 - ❌ No long-term caching to avoid stale data.
-- ❌ No need to store images locally.
 
 ### API Endpoints
 
@@ -53,7 +65,6 @@ We need a streaming image proxy, that meets the following requirements:
 - `/img/42/1` - returns the first image for product 42.
 - `/img/42/1/200x200` - returns the first image for product 42 resized to 200x200.
 - `/img/614/3` - returns the third image for product 614.
-- `/img/614/3/50%` - returns the third image for product 614 resized to 50% of the original size.
 - `/img/614/3/200w` - returns the third image for product 614 resized to 200 pixels wide.
 
 ## Notes
@@ -71,11 +82,11 @@ Only minor adjustments would be needed in the [ProductsApi](src/productsApi.ts) 
 | ---------- | ---------- | ---------------------- |
 | 42         | 1          | https://picsum.photos/1024 |
 | 42         | 2          | https://picsum.photos/1024 |
-| 614        | 1          | https://picsum.photos/1024 |
-| 614        | 2          | https://picsum.photos/1024 |
-| 614        | 3          | https://picsum.photos/1024 |
-| 614        | 4          | https://picsum.photos/1024 |
-| 614        | 5          | https://picsum.photos/1024 |
+| 614        | 1          | https://source.unsplash.com/random/900x700/?office |
+| 614        | 2          | https://source.unsplash.com/random/900x700/?office |
+| 614        | 3          | https://source.unsplash.com/random/900x700/?office |
+| 614        | 4          | https://source.unsplash.com/random/900x700/?office |
+| 614        | 5          | https://source.unsplash.com/random/900x700/?office |
 
 ## Testing
 
