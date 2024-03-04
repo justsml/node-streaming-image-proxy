@@ -13,14 +13,21 @@ npm start
 
 ## Overview
 
-This project solves a common & poorly documented challenge: **using node.js to stream media from a (hidden) source URL to a browser or native clients.**
+This project illustrates modern & approachable patterns for streaming APIs in Node.js.
+
+Included patterns and techniques:
+
+- 🏄‍♀️ HTTP Streaming.
+- 🔗 Composing binary streams.
+- 🚀 Performance tuning.
+- 🔎 Dynamic resizing.
 
 ### The Scenario
 
-Let's say we have an e-commerce site with **10's of millions of products.** Each product may have **up to 100 photos.** Bottom line: we need to **support a BILLION+ photos!**
+Let's say we have an e-commerce site with **10's of millions of products.** Each product may have **up to 100 photos.** All product URLs are lengthy & on 3rd party domains. Bottom line: we need to **support over a BILLION photos!**
 
-Every week 80% of all **primary** photos are requested.
-The vast majority of those 'additional' photos are rarely requested. Who really looks at the 88th photo of a product?
+<!-- Every week 80% of all **primary** photos are requested. -->
+<!-- The vast majority of those 'additional' photos are rarely requested. Who really looks at the 88th photo of a product? -->
 
 We need a streaming image proxy, that meets the following requirements:
 
@@ -30,32 +37,18 @@ We need a streaming image proxy, that meets the following requirements:
 - ✅ **Dynamic Resizing, Quality & Format** - To reduce client data over the wire.
 - ✅ **Dynamic Buffering** - Optimize server load given many tiny reqs.
 - ✅ Hide source URL details (protect vendor or partner names.)
-- 💪 ~~Excellent~~ Better coding patterns!
+- 💪 Better stream coding patterns!
 - ❌ No sync/cron jobs.
 - ❌ On-demand.
-- ❌ No long-term caching. Avoid stale data.
+- ❌ No long-term caching to avoid stale data.
 - ❌ No need to store images locally.
-
-### Ideas
-
-A list of related things I've worked on previously - some might just might make sense to include in this project.
-
-- [x] Few files.
-- [x] Minimal dependencies.
-- [ ] Image filters?
-- [ ] Watermark?
-- [ ] Credit?
-- [ ] EXIF scrubbing?
-- [ ] [Benchmarks.](#benchmarks)
-- [ ] Video streaming? Byte chunking?
-- [ ] Text streaming? (support for ChatGPT or similar services)?
 
 ### API Endpoints
 
 - `/img/:product_id/:photo_index`
 - `/img/:product_id/:photo_index/:resize`
 
-### Example
+#### Example URLs
 
 - `/img/42/1` - returns the first image for product 42.
 - `/img/42/1/200x200` - returns the first image for product 42 resized to 200x200.
@@ -84,7 +77,11 @@ Only minor adjustments would be needed in the [ProductsApi](src/productsApi.ts) 
 | 614        | 4          | https://picsum.photos/1024 |
 | 614        | 5          | https://picsum.photos/1024 |
 
-### Testing
+## Testing
+
+```sh
+npm test
+```
 
 <!-- 
 To simulate slow networks, you can use the `throttle` package.
@@ -103,7 +100,7 @@ return readStream.pipe(throttle)
 ``` 
 -->
 
-#### CLI Testing
+### CLI Testing
 
 ```sh
 curl -v http://localhost:3000/img/42/1
@@ -112,9 +109,9 @@ curl -v http://localhost:3000/img/614/3
 curl -v http://localhost:3000/img/614/3/50w
 ```
 
-### Benchmarks
+## Benchmarks
 
-#### [TL;DR Show Results](#results-un-buffered)
+### [TL;DR Show Results](#results-un-buffered)
 
 First, start the server with logging disabled.
 
@@ -227,3 +224,18 @@ Percentage of the requests served within a certain time (ms)
   99%   2019
  100%   2119 (longest request)
 ```
+
+## Ideas
+
+A list of related things I've worked on previously - some might just might make sense to include in this project.
+
+- [x] Few files.
+- [x] Minimal dependencies.
+- [ ] Image filters?
+- [ ] Watermark?
+- [ ] Credit?
+- [ ] Privacy/EXIF scrubbing?
+- [ ] [Benchmarks.](#benchmarks)
+- [ ] Video streaming? Byte chunking?
+- [ ] Text streaming? (support for ChatGPT or similar services)?
+

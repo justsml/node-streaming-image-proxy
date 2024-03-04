@@ -5,8 +5,8 @@ import cors from 'cors'
 import pinoHttp from 'pino-http'
 
 import type { Request, Response, NextFunction } from 'express'
-import logger from './logger'
-import { ImageFormats } from './imageResizer'
+import logger from '@/logger'
+import { ImageFormats } from '@/imageResizer'
 
 // const logMode = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'
 
@@ -57,4 +57,30 @@ export function catchErrorHandler(
   response
     .status(Number.isInteger(error?.status) ? error.status! : 500)
     .send({ error: error.message, stack, url: request.originalUrl })
+}
+
+/** Buffers a stream to buffer an input `stream` by `chunkBytes`  */
+export function bufferByChunk(stream: NodeJS.ReadableStream, chunkBytes = 1024 * 64) {
+  const { PassThrough } = require('stream')
+  const pass = new PassThrough()
+  let buffer = Buffer.from('')
+  stream.on('data', (chunk) => {
+    const size = Buffer.byteLength(chunk)
+    if (size > chunkBytes) {
+      // Note: should be a rare case
+      // resize the chunk size up to at-least the size of the chunk
+      chunkBytes = size
+      pass.write(chunk)
+      return
+    }
+    buffer = Buffer.concat([buffer, chunk])
+    if (buffer.length >= chunkBytes) {
+      pass.write(buffer)
+      buffer = Buffer.from('')
+    }
+  })
+  stream.on('end', () => {
+    pass.end(buffer)
+  })
+  return pass
 }

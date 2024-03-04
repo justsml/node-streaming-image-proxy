@@ -1,10 +1,10 @@
 import { pipeline } from 'stream/promises'
 import { Router } from 'express'
-import { ProductsApi } from './productsApi'
-import { getStreamInfoFromUrl } from './imageLoader'
-import logger from './logger'
-import { ImageFormats, resizeImage } from './imageResizer'
-import { isValidImageFormat } from './shared'
+import { ProductsApi } from '@/productsApi'
+import { getStreamInfoFromUrl } from '@/imageLoader'
+import logger from '@/logger'
+import { ImageFormats, resizeImage } from '@/imageResizer'
+import { isValidImageFormat } from '@/shared'
 
 const imagesRouter = Router().get(
   '/:id/:index/:resize?',
@@ -17,6 +17,7 @@ const imagesRouter = Router().get(
     const { id, index, resize } = request.params
 
     format = isValidImageFormat(format!)
+    quality = Math.max(50, Math.min(Number(quality), 100))
 
     logger.debug(
       'Loading id: %d, index: %d, resize: %s, format: %s',

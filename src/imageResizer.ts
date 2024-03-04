@@ -1,6 +1,6 @@
 import os from 'os'
 import sharp, { Sharp } from 'sharp'
-import logger from './logger'
+import logger from '@/logger'
 import type { Readable } from 'stream'
 
 export type ImageFormats = 'webp' | 'jpeg' | 'png' | 'gif'
@@ -21,11 +21,12 @@ enhancifySystem()
  *
  * **Note:** Whenever you change the bytes of the image, you SHOULD ideally also change the Content-Length header. If it's not possible, you can remove the Content-Length header to let the client know that the length is unknown. This can cause issues with some clients, so it's not recommended.
  *
- * @param stream - The image stream
+ * @param stream - The readable image stream
  * @param [format] - The format to change to
  * @param [quality=80] - The quality of the image
  * @param [resizeExpression] - The resize expression
  * @param [sharpOptions] - The sharp.resize() options
+ * @returns The transformed image stream
  */
 export function resizeImage(
   stream: Readable,
@@ -43,8 +44,6 @@ export function resizeImage(
 ) {
   if (!resizeExpression) return stream
 
-  quality = Math.max(1, Math.min(Number(quality), 100))
-
   let transformer = sharp().resize({
     ..._translateResizeExpression(resizeExpression),
     ...(sharpOptions || {}),
@@ -52,7 +51,6 @@ export function resizeImage(
   })
 
   if (format) transformer = transformer[format]({ quality })
-
   return stream.pipe(transformer)
 }
 

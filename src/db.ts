@@ -1,6 +1,6 @@
 import Database from 'libsql'
 
-export type Database = ReturnType<typeof Database>;
+export type Database = ReturnType<typeof Database>
 
 /**
  * A dummy local DB for testing
@@ -8,7 +8,14 @@ export type Database = ReturnType<typeof Database>;
 export function connectDb(): Database {
   const db = new Database(':memory:')
   // db.pragma('journal_mode = WAL'); // Use when on disk
+  seedDb(db)
 
+  console.debug('Database loaded & initialized')
+
+  return db
+}
+
+function seedDb(db: Database) {
   db.exec(
     'CREATE TABLE product_photos (product_id INTEGER, media_rank INTEGER, url TEXT)',
   )
@@ -18,20 +25,38 @@ export function connectDb(): Database {
   )
 
   seedPhotos.map((productImg) => {
-    insertCmd.run({...productImg, url: `https://picsum.photos/1024`})
+    insertCmd.run({ ...productImg })
   })
-
-  console.debug('Database loaded & initialized')
 
   return db
 }
 
 const seedPhotos = [
-  { product_id: 42, media_rank: 1, url: 'https://example.com/900/1' },
-  { product_id: 42, media_rank: 2, url: 'https://example.com/900/2' },
-  { product_id: 614, media_rank: 1, url: 'https://acme.example.com/614/1' },
-  { product_id: 614, media_rank: 2, url: 'https://acme.example.com/614/2' },
-  { product_id: 614, media_rank: 3, url: 'https://acme.example.com/614/3' },
-  { product_id: 614, media_rank: 4, url: 'https://acme.example.com/614/4' },
-  { product_id: 614, media_rank: 5, url: 'https://acme.example.com/614/5' },
+  { product_id: 42, media_rank: 1, url: 'https://picsum.photos/1024' },
+  { product_id: 42, media_rank: 2, url: 'https://picsum.photos/1024' },
+  {
+    product_id: 614,
+    media_rank: 1,
+    url: 'https://source.unsplash.com/random/900x700/?office',
+  },
+  {
+    product_id: 614,
+    media_rank: 2,
+    url: 'https://source.unsplash.com/random/600x400/?office',
+  },
+  {
+    product_id: 614,
+    media_rank: 3,
+    url: 'https://source.unsplash.com/random/600x400/?office',
+  },
+  {
+    product_id: 614,
+    media_rank: 4,
+    url: 'https://source.unsplash.com/random/600x400/?office',
+  },
+  {
+    product_id: 614,
+    media_rank: 5,
+    url: 'https://source.unsplash.com/random/600x400/?office',
+  },
 ]

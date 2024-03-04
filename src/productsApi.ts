@@ -1,4 +1,4 @@
-import { connectDb } from './db'
+import { connectDb } from '@/db'
 
 const db = connectDb()
 
