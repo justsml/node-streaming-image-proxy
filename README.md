@@ -1,4 +1,5 @@
 # Node.js Streaming Proxy
+<!-- markdownlint-disable no-bare-urls -->
 
 - [Description](#description)
 - [Overview](#overview)
@@ -18,6 +19,8 @@
 This is a **reference quality** streaming proxy server that can be used to proxy content from a source URL to the browser.
 
 It is written in TypeScript and uses Express.js as the web server.
+
+For image processing it uses the excellent [`sharp`](https://github.com/lovell/sharp?tab=readme-ov-file) library, which uses the ultra fast [libvips](https://github.com/libvips/libvips) under the hood.
 
 ```sh
 npm i
@@ -249,4 +252,3 @@ A list of related things I've worked on previously - some might just might make 
 - [ ] [Benchmarks.](#benchmarks)
 - [ ] Video streaming? Byte chunking?
 - [ ] Text streaming? (support for ChatGPT or similar services)?
-
