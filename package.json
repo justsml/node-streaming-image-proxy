@@ -1,12 +1,17 @@
 {
   "name": "streaming-image-proxy",
   "version": "1.0.0",
-  "description": "",
+  "description": "Node.js streaming image & media proxy",
   "main": "src/index.ts",
   "scripts": {
     "test": "vitest",
     "start": "NODE_ENV=production tsx src/index.ts",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "bun:start": "NODE_ENV=production bun run src/index.ts",
+    "bun:dev": "bun watch src/index.ts",
+    "docker:build": "docker build -t node-streaming-image-proxy .",
+    "docker:run": "docker run --name img-proxy --rm -p 3000:3000 -d node-streaming-image-proxy",
+    "docker:stop": "docker stop img-proxy"    
   },
   "keywords": [],
   "author": "",

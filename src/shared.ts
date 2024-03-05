@@ -84,3 +84,22 @@ export function bufferByChunk(stream: NodeJS.ReadableStream, chunkBytes = 1024 *
   })
   return pass
 }
+
+export function registerContainerLifeCycleEvents() {
+  process.on('SIGTERM', () => {
+    logger.info('SIGTERM signal received.')
+    process.exit(0)
+  })
+  process.on('SIGINT', () => {
+    logger.info('SIGINT signal received.')
+    process.exit(0)
+  })
+  process.on('uncaughtException', (error) => {
+    logger.error(error, 'Uncaught Exception thrown')
+    process.exit(1)
+  })
+  process.on('unhandledRejection', (reason, promise) => {
+    logger.error({ promise, reason }, 'Unhandled Rejection at:')
+    process.exit(1)
+  })
+}
