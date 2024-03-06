@@ -130,6 +130,8 @@ curl -v http://localhost:3000/img/614/3/50w
 
 ### [TL;DR Show Results](#results-un-buffered)
 
+![requests per second](benchmark/results/mac-air-m2-2022/requests-per-second.png)
+
 First, start the server with logging disabled.
 
 ```sh
