@@ -1,7 +1,7 @@
 import os from 'os'
-import sharp, { Sharp } from 'sharp'
-import logger from '@/logger'
 import type { Readable } from 'stream'
+import logger from '@/logger'
+import sharp, { Sharp } from 'sharp'
 import { isValidImageFormat } from './shared'
 
 type ResizeArgs = Parameters<Sharp['resize']>[0]
@@ -11,9 +11,9 @@ type ResizeImageOptions = {
   format?: string
   /** The quality of the image. 1-100 */
   quality?: number
-  /** 
+  /**
    * The resize expression.
-   * 
+   *
    * Examples:
    * - `100x100`
    * - `100w`

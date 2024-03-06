@@ -17,7 +17,7 @@ const pinoOptions: PinoArgs =
           redact: {
             paths: ['req.headers', 'res.headers'],
             remove: true,
-          }
+          },
         },
         pretty({
           colorize: true,

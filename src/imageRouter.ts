@@ -1,23 +1,26 @@
-import { pipeline } from 'stream/promises'
-import { Router } from 'express'
-import { ProductsApi } from '@/productsApi'
 import { getStreamInfoFromUrl } from '@/imageLoader'
 import { resizeImage } from '@/imageResizer'
-import { isValidImageFormat } from '@/shared'
 import logger from '@/logger'
+import { ProductsApi } from '@/productsApi'
+import { isValidImageFormat } from '@/shared'
+import { Router } from 'express'
+import { pipeline } from 'stream/promises'
 
 const imagesRouter = Router().get(
   '/:id/:index/:resize?',
   (request, response, next) => {
-    let q = request.query as {
-      format?: string
-      quality?: number
-    }
+    const q = request.query
 
     const { id, index, resize } = request.params
 
-    const format = isValidImageFormat(q.format!) ? q.format : undefined
-    const quality = Math.max(10, Math.min(Number(q.quality), 100)) ?? 80
+    const format =
+      typeof q.format === 'string' && isValidImageFormat(`${q.format}`)
+        ? q.format
+        : undefined
+    const quality =
+      typeof q.quality === 'string'
+        ? Math.max(10, Math.min(Number(q.quality), 100))
+        : 80
 
     logger.debug(
       'Loading id: %d, index: %d, resize: %s, format: %s',
@@ -48,9 +51,8 @@ const imagesRouter = Router().get(
           response.setHeader('Content-Type', mimeType)
 
           return pipeline(stream, response).catch(next)
-        } else {
-          return next(new Error('Image not found'))
         }
+        return next(new Error('Image not found'))
       })
       .catch(next)
   },

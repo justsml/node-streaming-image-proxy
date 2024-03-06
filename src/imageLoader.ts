@@ -1,5 +1,5 @@
-import axios from 'axios'
 import type { Readable } from 'stream'
+import axios from 'axios'
 
 /**
  * Get a binary stream from a URL, with the byte count and MIME type.

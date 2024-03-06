@@ -1,11 +1,11 @@
+import cors from 'cors'
 import express from 'express'
 // import morgan from 'morgan'
 import helmet from 'helmet'
-import cors from 'cors'
 import pinoHttp from 'pino-http'
 
-import type { Request, Response, NextFunction } from 'express'
 import logger from '@/logger'
+import type { NextFunction, Request, Response } from 'express'
 
 // const logMode = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'
 
@@ -22,9 +22,9 @@ type ImageFormats = keyof typeof validImageFormats
  * Check if the image format is supported.
  */
 export const isValidImageFormat = (format?: string): format is ImageFormats =>
-  format != undefined && format in validImageFormats
+  format != null && format in validImageFormats
 
-export const baseServer = (disableLogging: boolean = false) =>
+export const baseServer = (disableLogging = false) =>
   express()
     .use(helmet())
     .use(express.json())
