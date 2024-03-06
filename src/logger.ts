@@ -31,7 +31,7 @@ const pinoOptions: PinoArgs =
             paths: ['req.headers', 'res.headers'],
             remove: true,
           },
-          level: 'debug',
+          level: 'warn',
         },
       ]
 

@@ -2,22 +2,22 @@ import { pipeline } from 'stream/promises'
 import { Router } from 'express'
 import { ProductsApi } from '@/productsApi'
 import { getStreamInfoFromUrl } from '@/imageLoader'
-import { ImageFormats, resizeImage } from '@/imageResizer'
+import { resizeImage } from '@/imageResizer'
 import { isValidImageFormat } from '@/shared'
 import logger from '@/logger'
 
 const imagesRouter = Router().get(
   '/:id/:index/:resize?',
   (request, response, next) => {
-    let { format, quality } = request.query as {
-      format?: ImageFormats
+    let q = request.query as {
+      format?: string
       quality?: number
     }
 
     const { id, index, resize } = request.params
 
-    format = isValidImageFormat(format!)
-    quality = Math.max(50, Math.min(Number(quality), 100))
+    const format = isValidImageFormat(q.format!) ? q.format : undefined
+    const quality = Math.max(10, Math.min(Number(q.quality), 100)) ?? 80
 
     logger.debug(
       'Loading id: %d, index: %d, resize: %s, format: %s',
@@ -61,28 +61,30 @@ const processImage = async ({
   resize,
   format,
   quality,
-}: ProcessImageArgs) => {
+}: Record<string, string | number | undefined>) => {
+  if (!url || typeof url !== 'string') throw new Error('Invalid URL')
   let { stream, byteCount, mimeType } = await getStreamInfoFromUrl(url)
 
   if (resize || format || quality) {
-    logger.info({ resize, format, quality }, 'Resizing image')
+    resize = resize != null ? `${resize}` : undefined
+    format = format != null ? `${format}` : undefined
+    quality = quality != null ? Number(quality) : undefined
+
+    if (format) mimeType = `image/${format}`
+    byteCount = 0
+
+    logger.debug(
+      { resize, format, quality, originalBytes: byteCount },
+      'Resizing image',
+    )
     stream = resizeImage(stream, {
       resizeExpression: resize,
       format,
       quality,
     })
-    byteCount = 0
-    if (format) mimeType = `image/${format}`
   }
 
   return { stream, byteCount, mimeType }
-}
-
-type ProcessImageArgs = {
-  url: string
-  resize?: string
-  format?: ImageFormats
-  quality?: number
 }
 
 export default imagesRouter

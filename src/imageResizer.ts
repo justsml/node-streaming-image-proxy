@@ -2,14 +2,27 @@ import os from 'os'
 import sharp, { Sharp } from 'sharp'
 import logger from '@/logger'
 import type { Readable } from 'stream'
-
-export type ImageFormats = 'webp' | 'jpeg' | 'png' | 'gif'
+import { isValidImageFormat } from './shared'
 
 type ResizeArgs = Parameters<Sharp['resize']>[0]
+
 type ResizeImageOptions = {
-  format?: ImageFormats
+  /** The format to change to */
+  format?: string
+  /** The quality of the image. 1-100 */
   quality?: number
+  /** 
+   * The resize expression.
+   * 
+   * Examples:
+   * - `100x100`
+   * - `100w`
+   * - `h100`
+   * - `42`
+   */
   resizeExpression?: string
+
+  /** The sharp.resize() options */
   sharpOptions?: ResizeArgs
 }
 
@@ -50,7 +63,8 @@ export function resizeImage(
     withoutEnlargement: true,
   })
 
-  if (format) transformer = transformer[format]({ quality })
+  if (isValidImageFormat(format)) transformer = transformer[format]({ quality })
+
   return stream.pipe(transformer)
 }
 
@@ -100,5 +114,5 @@ function enhancifySystem() {
 
   sharp.concurrency(Math.max(1, cpuCount - 1))
   sharp.simd(true)
-  sharp.cache(false) // Set `false` on VPS/Lambda environments, `true` on 64GB+ dedicated servers.
+  // sharp.cache(false) // Set `false` on VPS/Lambda environments, `true` on 64GB+ dedicated servers.
 }

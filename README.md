@@ -94,6 +94,9 @@ Only minor adjustments would be needed in the [ProductsApi](src/productsApi.ts) 
 ## Testing
 
 ```sh
+# Start the local static file server
+npm start:static
+# Start the streaming proxy server
 npm test
 ```
 

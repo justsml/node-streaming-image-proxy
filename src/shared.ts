@@ -6,32 +6,30 @@ import pinoHttp from 'pino-http'
 
 import type { Request, Response, NextFunction } from 'express'
 import logger from '@/logger'
-import { ImageFormats } from '@/imageResizer'
 
 // const logMode = process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'
 
-const validImageFormats: ImageFormats[] = [
-  'webp',
-  'jpeg',
-  'png',
-  'gif',
-] as const
+const validImageFormats = {
+  webp: 'webp',
+  jpeg: 'jpeg',
+  png: 'png',
+  gif: 'gif',
+} as const
+
+type ImageFormats = keyof typeof validImageFormats
 
 /**
  * Check if the image format is supported.
  */
-export const isValidImageFormat = (format: string): ImageFormats | undefined =>
-  // @ts-expect-error
-  validImageFormats.includes(format) ? (format as ImageFormats) : undefined
+export const isValidImageFormat = (format?: string): format is ImageFormats =>
+  format != undefined && format in validImageFormats
 
 export const baseServer = (disableLogging: boolean = false) =>
   express()
     .use(helmet())
     .use(express.json())
     .use(express.urlencoded({ extended: false }))
-
     .use(disableLogging ? echoRoute : pinoHttp({ logger }))
-    // .use(morgan(logMode))
     .use(cors({ origin: true, credentials: true }))
     .disable('x-powered-by')
 
@@ -60,7 +58,10 @@ export function catchErrorHandler(
 }
 
 /** Buffers a stream to buffer an input `stream` by `chunkBytes`  */
-export function bufferByChunk(stream: NodeJS.ReadableStream, chunkBytes = 1024 * 64) {
+export function bufferByChunk(
+  stream: NodeJS.ReadableStream,
+  chunkBytes = 1024 * 64,
+) {
   const { PassThrough } = require('stream')
   const pass = new PassThrough()
   let buffer = Buffer.from('')
